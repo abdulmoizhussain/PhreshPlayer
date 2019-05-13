@@ -236,7 +236,7 @@
     const Store = require('electron-store');
     const store = new Store();
 
-    if (store.has('settings.do_skipping'))
+    if (!store.has('settings.do_skipping'))
       store.set('settings.do_skipping', false);
 
     let doSkipping = store.get('settings.do_skipping');
