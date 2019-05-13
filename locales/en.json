@@ -18,6 +18,7 @@
   "forward": "Forward",
   "next": "Next",
   "subtitle": "Subtitle",
+  "skip": "Skip",
   "sound_track": "Sound track",
   "file_not_saved": "File not saved",
   "file_save_failed": "File save failed. Error: ",
