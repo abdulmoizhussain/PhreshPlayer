@@ -518,18 +518,26 @@ function loadSkipFile(_skipFileName = "", _skipFilePath = "") {
   const __skipDurations = [];
   _skipData.split("\r").forEach(function (_line) {
     _line = _line.replace(/\s/g, '');
-    if (/^[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}-[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}$/g.test(_line)) {
+
+    let delim = ":";
+    if (new RegExp(`^[0-9]{1,2}${delim}[0-9]{1,2}${delim}[0-9]{1,2}-[0-9]{1,2}${delim}[0-9]{1,2}${delim}[0-9]{1,2}$`).test(_line)) {
       const _lineSplitted = _line.split("-");
-      __skipDurations.push([
-        getTimeInSeconds(_lineSplitted[0]), // start time
-        getTimeInSeconds(_lineSplitted[1])  // end time
-      ]);
+      __skipDurations.push([getTimeInSeconds(_lineSplitted[0], delim), getTimeInSeconds(_lineSplitted[1], delim)]);
+      return;
+    }
+
+    delim = ".";
+    if (new RegExp(`^[0-9]{1,2}${delim}[0-9]{1,2}${delim}[0-9]{1,2}-[0-9]{1,2}${delim}[0-9]{1,2}${delim}[0-9]{1,2}$`).test(_line)) {
+      const _lineSplitted = _line.split("-");
+      __skipDurations.push([getTimeInSeconds(_lineSplitted[0], delim), getTimeInSeconds(_lineSplitted[1], delim)]);
     }
   });
   skipDurations = [...__skipDurations];
+  _setSkipState();
   allSkipNum.innerHTML = 1;
-  function getTimeInSeconds(timeInStr = "") {
-    const __timeSplitted = timeInStr.split(":");
+  
+  function getTimeInSeconds(timeInStr = "", delimiter = ":") {
+    const __timeSplitted = timeInStr.split(delimiter);
     const _tH = parseInt(__timeSplitted[0]);
     const _tM = parseInt(__timeSplitted[1]);
     const _tS = parseInt(__timeSplitted[2]);
@@ -561,10 +569,10 @@ function toggleSkipState(_switch) {
 }
 
 function _setSkipState(_boolState) {
-  doSkipping = _boolState;
-  store.set('settings.do_skipping', _boolState);
-  currSkipNum.innerHTML = i18n.__(_boolState ? "on" : "off");
-  setToast(i18n.__('skip') + ': ' + i18n.__(_boolState ? "on" : "off"));
+  doSkipping = _boolState === undefined ? store.get('settings.do_skipping') : _boolState;
+  store.set('settings.do_skipping', doSkipping);
+  currSkipNum.innerHTML = i18n.__(doSkipping ? "on" : "off");
+  setToast(i18n.__('skip') + ': ' + i18n.__(doSkipping ? "on" : "off"));
 }
 
 function setLastPlayed(playingData, currentTime) {
