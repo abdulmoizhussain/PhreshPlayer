@@ -517,25 +517,41 @@ function loadSkipFile(_skipFileName = "", _skipFilePath = "") {
   const _skipData = _skipFileContent.toString();
   const __skipDurations = [];
   _skipData.split("\r").forEach(function (_line) {
-    _line = _line.replace(/\s/g, '');
+    _line = _line.replace(/\s/g, "");
 
     let delim = ":";
     if (new RegExp(`^[0-9]{1,2}${delim}[0-9]{1,2}${delim}[0-9]{1,2}-[0-9]{1,2}${delim}[0-9]{1,2}${delim}[0-9]{1,2}$`).test(_line)) {
-      const _lineSplitted = _line.split("-");
-      __skipDurations.push([getTimeInSeconds(_lineSplitted[0], delim), getTimeInSeconds(_lineSplitted[1], delim)]);
+      calculateSkipDurations(_line, delim);
       return;
     }
 
     delim = ".";
     if (new RegExp(`^[0-9]{1,2}${delim}[0-9]{1,2}${delim}[0-9]{1,2}-[0-9]{1,2}${delim}[0-9]{1,2}${delim}[0-9]{1,2}$`).test(_line)) {
-      const _lineSplitted = _line.split("-");
-      __skipDurations.push([getTimeInSeconds(_lineSplitted[0], delim), getTimeInSeconds(_lineSplitted[1], delim)]);
+      calculateSkipDurations(_line, delim);
     }
   });
   skipDurations = [...__skipDurations];
   _setSkipState();
   allSkipNum.innerHTML = 1;
-  
+
+  function calculateSkipDurations(_line = "", delim = ":") {
+    const _lineSplitted = _line.split("-");
+    const [__minute0, __second0] = getMinNSec(_lineSplitted[0], delim);
+    const [__minute1, __second1] = getMinNSec(_lineSplitted[1], delim);
+    if (inRange(__minute0) && inRange(__second0) && inRange(__minute1) && inRange(__second1)) {
+      __skipDurations.push([getTimeInSeconds(_lineSplitted[0], delim), getTimeInSeconds(_lineSplitted[1], delim)]);
+    }
+  }
+
+  function inRange(number = 0) {
+    return number >= 0 && number < 60;
+  }
+
+  function getMinNSec(timeInStr = "", delimiter = ":") {
+    const __timeSplitted = timeInStr.split(delimiter);
+    return [parseInt(__timeSplitted[1]), parseInt(__timeSplitted[2])];
+  }
+
   function getTimeInSeconds(timeInStr = "", delimiter = ":") {
     const __timeSplitted = timeInStr.split(delimiter);
     const _tH = parseInt(__timeSplitted[0]);
