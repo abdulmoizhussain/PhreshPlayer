@@ -563,6 +563,7 @@ function loadSkipFile(_skipFileName = "", _skipFilePath = "") {
 
 function skipScene(__currentTime) {
   if (doSkipping) { // only when skipping is on
+    __currentTime = Math.floor(__currentTime);
     for (__duration of skipDurations) {
       //   const skipStart = getTimeInSeconds(__duration[0]); // e.g: "00:20:00"
       //   const skipEnd = getTimeInSeconds(__duration[1]);   // e.g: "01:30:00"
