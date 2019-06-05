@@ -12,6 +12,8 @@ module.exports = {
   changeAudioTrack,
   toggleSkipState,
   skipScene,
+  skipNextScene,
+  loadSkipFile,
   setLastPlayed
 };
 
@@ -45,7 +47,9 @@ function playVideo(videoid) {
 
     if (d !== null) {
 
-      loadSkipFile(d._name, d._path);
+      currentFileName = d._name;
+      currentFilePath = d._path;
+      loadSkipFile();
 
       w3.hide("#aacconvertspan");
       w3.hide("#aacconvertspanclose");
@@ -499,9 +503,9 @@ function getAudioEncoding(mkvpath) {
   });
 
 }
-function loadSkipFile(_skipFileName = "", _skipFilePath = "") {
-  _skipFileName = _skipFileName.substring(0, _skipFileName.lastIndexOf("."));
-  _skipFilePath = path.dirname(_skipFilePath);
+function loadSkipFile() {
+  const _skipFileName = currentFileName.substring(0, currentFileName.lastIndexOf("."));
+  const _skipFilePath = path.dirname(currentFilePath);
   allSkipNum.innerHTML = 0;
   let _skipFileContent = "";
   try {
@@ -561,15 +565,27 @@ function loadSkipFile(_skipFileName = "", _skipFilePath = "") {
   }
 }
 
-function skipScene(__currentTime) {
-  if (doSkipping) { // only when skipping is on
-    __currentTime = Math.floor(__currentTime);
+function skipNextScene(__currentTimeExact) {
+  if (doSkipping) {
+    const __currentTime = Math.floor(__currentTimeExact) + 1;
     for (__duration of skipDurations) {
-      //   const skipStart = getTimeInSeconds(__duration[0]); // e.g: "00:20:00"
-      //   const skipEnd = getTimeInSeconds(__duration[1]);   // e.g: "01:30:00"
+      if (__currentTime >= __duration[0] && __currentTime <= __duration[1]) {
+        setTimeout(function () {
+          videoplayer.currentTime = __duration[1] + 1;
+        }, (__currentTime - __currentTimeExact) * 1000);
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function skipScene(__currentTimeExact) {
+  if (doSkipping) { // only when skipping is on
+    const __currentTime = Math.floor(__currentTimeExact);
+    for (__duration of skipDurations) {
       if (__currentTime >= __duration[0] && __currentTime <= __duration[1]) {
         videoplayer.currentTime = __duration[1] + 1;
-        //     videoplayer.currentTime = skipEnd + 1;
         return true;
       }
     }

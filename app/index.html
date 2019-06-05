@@ -235,6 +235,7 @@
 
     const Store = require('electron-store');
     const store = new Store();
+    let currentFileName = "", currentFilePath = "";
 
     if (!store.has('settings.do_skipping'))
       store.set('settings.do_skipping', false);
@@ -390,7 +391,7 @@
       let currTime = videoplayer.currentTime;
       let reamingTime = mediaDuration - currTime;
 
-      if (playerjs.skipScene(currTime)) {
+      if (playerjs.skipNextScene(currTime)) {
         return;
       }
 
@@ -716,6 +717,7 @@
 
     /* hotkeys */
 
+    Mousetrap.bind('f12', function () { toggleDevTools(); });
     Mousetrap.bind('l', function () { playlistjs.toggleShowPlaylist(); });
     Mousetrap.bind(['f', 'enter'], function () {
       toggleFullScreen();
@@ -739,6 +741,7 @@
         playerjs.handlePlayPause('pause');
       } else {
         playerjs.handlePlayPause('play');
+        playerjs.loadSkipFile();
       }
     });
 
