@@ -21,7 +21,7 @@ Because other solutions like croping/cutting whole movies/videos are quite time 
 3. If there are more than one scenes, define them on new lines, like in the picture below:
 <img src="https://github.com/abdulmoizhussain/PhreshPlayer/blob/custom/examples/p1.png" width="700" alt="Playing video">
 
-4. Now save the file with the same name as your video file but with a **`.skip`** extension & then save the **`.skip`** file in the same directory as your video file:
+4. Now save the file with the **same name** as your video file but with a **`.skip`** extension & then save the **`.skip`** file in the **same directory** as your video file:
 <img src="https://github.com/abdulmoizhussain/PhreshPlayer/blob/custom/examples/p2.png" width="700" alt="Playing video">
 <img src="https://github.com/abdulmoizhussain/PhreshPlayer/blob/custom/examples/p3.png" width="700" alt="Playing video">
 
