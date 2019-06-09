@@ -10,7 +10,7 @@ The media-player will skip unwanted/inappropriate scenes ***(already defined in 
 #### Reason?
 Because other solutions like croping/cutting whole movies/videos are quite time & resource consuming.
 
-## How to create a skip-file for a video:
+## How to create a `.skip` file for a video:
 
 1. Open notepad and define time-span(s) [which you want to skip automatically during a playback]:
 * e.g:
