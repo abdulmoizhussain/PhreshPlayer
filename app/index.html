@@ -372,7 +372,7 @@
 
     document.addEventListener("mousemove", function (e) {
       showControls();
-      // hideControls();
+      hideControls();
     }, false);
 
     controls.addEventListener("mouseenter", function (e) {
@@ -806,7 +806,7 @@
       if (hideControlsAlowed) {
         controlsIsVisible = setTimeout(function () {
           controls.style.display = 'none';
-        }, 5000);
+        }, 1500);
       }
     }
     function getVideoTime(ms) {

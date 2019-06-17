@@ -1,4 +1,4 @@
-# Phreshplayer - <a href="https://drive.google.com/open?id=151eVYYbWsfGRfyf-qs-JmT6DQdp5-STZ">Download Link for Windows</a>
+# Phreshplayer - <a href="https://drive.google.com/open?id=1iXDyghai1v39v7xJ1IyzPKvUZRMVsjzc">Download Link for Windows</a>
 
 
 ## NOTE: The project is forked (copied) from the <a href="https://github.com/Phreshhh" target="_blank">user: (Phreshhh)</a>. <br> I have  only added ***skipping-scenes-functionality*** in it.
@@ -33,7 +33,7 @@ Because other solutions like croping/cutting whole movies/videos are quite time 
 **Off means**: The playback will be in normal flow, the scenes will not be skipped.
 
 
-## <a href="https://drive.google.com/open?id=151eVYYbWsfGRfyf-qs-JmT6DQdp5-STZ">Download Link for Windows</a>
+## <a href="https://drive.google.com/open?id=1iXDyghai1v39v7xJ1IyzPKvUZRMVsjzc">Download Link for Windows</a>
 
 ## Below is the documentaion of Phreshh player written by the <a href="https://github.com/Phreshhh" target="_blank">owner</a>.
 <br><br>
