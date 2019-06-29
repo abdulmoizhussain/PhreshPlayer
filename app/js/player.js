@@ -140,28 +140,18 @@ function playNext() {
 }
 
 function volumeControl(setto) {
+  let currVolume = Math.round(videoplayer.volume * 100) / 100;
 
-  let currVolume = videoplayer.volume;
-
-  if (setto === "up") {
-
-    if (currVolume < 1) {
-      videoplayer.volume = currVolume + 0.1;
-    }
-
-  } else if (setto === "down") {
-
-    if (currVolume > 0.1) {
-      videoplayer.volume = currVolume - 0.1;
-    }
-
+  if (setto === "up" && currVolume < 1) {
+    currVolume += 0.05;
+  } else if (setto === "down" && currVolume > 0) {
+    currVolume -= 0.05;
   }
 
-  store.set('settings.volume', videoplayer.volume);
+  videoplayer.volume = currVolume;
+  store.set('settings.volume', currVolume);
 
-  let currVolumePercent = Math.floor(currVolume * 100);
-  setToast(i18n.__('volume') + ' ' + currVolumePercent + '%');
-
+  setToast(i18n.__('volume') + ' ' + Math.floor(currVolume * 100) + '%');
 }
 
 function volumeMute() {
@@ -181,9 +171,7 @@ function volumeMute() {
     videoplayer.volume = 1;
     w3.removeClass('#mutebutton', 'activated');
     setToast(i18n.__('mute') + ' ' + i18n.__('off'));
-
   }
-
 }
 
 function seekVideo(goto) {

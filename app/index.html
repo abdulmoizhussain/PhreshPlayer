@@ -800,12 +800,13 @@
 
     function showControls() {
       clearTimeout(controlsIsVisible);
-      controls.style.display = 'block';
+      controls.style.display = "block";
+      videoplayer.style.cursor = "auto";
     }
     function hideControls() {
       if (hideControlsAlowed) {
         controlsIsVisible = setTimeout(function () {
-          controls.style.display = 'none';
+          controls.style.display = videoplayer.style.cursor = "none";
         }, 1500);
       }
     }
