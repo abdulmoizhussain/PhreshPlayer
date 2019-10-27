@@ -367,7 +367,7 @@
       playlist.style.height = h + "px";
     });
 
-    let controlsIsVisible;
+    let controlsAreVisible;
     let hideControlsAlowed = true;
 
     document.addEventListener("mousemove", function (e) {
@@ -731,6 +731,8 @@
 
     Mousetrap.bind('left', function () { playerjs.seekVideo("backward"); });
     Mousetrap.bind('right', function () { playerjs.seekVideo("forward"); });
+    Mousetrap.bind('ctrl+left', function () { playerjs.seekVideo("backward", 60); });
+    Mousetrap.bind('ctrl+right', function () { playerjs.seekVideo("forward", 60); });
 
     Mousetrap.bind('n', function () { playerjs.playNext(); });
     Mousetrap.bind('b', function () { playerjs.playPrev(); });
@@ -799,17 +801,18 @@
     }
 
     function showControls() {
-      clearTimeout(controlsIsVisible);
+      clearTimeout(controlsAreVisible);
       controls.style.display = "block";
       videoplayer.style.cursor = "auto";
     }
     function hideControls() {
       if (hideControlsAlowed) {
-        controlsIsVisible = setTimeout(function () {
+        controlsAreVisible = setTimeout(function () {
           controls.style.display = videoplayer.style.cursor = "none";
         }, 1500);
       }
     }
+
     function getVideoTime(ms) {
       let date = new Date(ms);
       let time = [];

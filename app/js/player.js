@@ -174,7 +174,7 @@ function volumeMute() {
   }
 }
 
-function seekVideo(goto) {
+function seekVideo(goto, gotoDurationInSeconds = 5) {
 
   let mediaDuration = videoplayer.duration;
   let currTime = videoplayer.currentTime;
@@ -182,20 +182,26 @@ function seekVideo(goto) {
   switch (goto) {
     case "forward":
       if (currTime < mediaDuration) {
-        const forwardTime = currTime + 5;
-        if (playerjs.skipScene(forwardTime)) {
-          return;
+        let forwardedTime = currTime + gotoDurationInSeconds;
+
+        const durationToSkip = isThisSceneSkippable(forwardedTime);
+        if (durationToSkip) {
+          forwardedTime = durationToSkip[1] + (forwardedTime - durationToSkip[0]);
         }
-        videoplayer.currentTime = forwardTime;
+
+        videoplayer.currentTime = forwardedTime;
       }
       break;
     case "backward":
       if (currTime !== NaN && currTime > 0) {
-        const backwardTime = currTime - 5;
-        if (playerjs.skipScene(backwardTime)) {
-          return;
+        let reversedTime = currTime - gotoDurationInSeconds;
+
+        const durationToSkip = isThisSceneSkippable(reversedTime);
+        if (durationToSkip) {
+          reversedTime = durationToSkip[0] - (durationToSkip[1] - reversedTime);
         }
-        videoplayer.currentTime = backwardTime;
+
+        videoplayer.currentTime = reversedTime;
       }
       break;
   }
@@ -566,6 +572,18 @@ function skipNextScene(__currentTimeExact) {
     }
   }
   return false;
+}
+
+function isThisSceneSkippable(__currentTimeExact) {
+  if (doSkipping) {
+    const __currentTime = Math.floor(__currentTimeExact);
+    for (__durationToSkip of skipDurations) {
+      if (__currentTime >= __durationToSkip[0] && __currentTime <= __durationToSkip[1]) {
+        return __durationToSkip;
+      }
+    }
+  }
+  return null;
 }
 
 function skipScene(__currentTimeExact) {
