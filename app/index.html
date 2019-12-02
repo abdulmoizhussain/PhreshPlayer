@@ -816,28 +816,23 @@
     }
 
     function getVideoTime(ms) {
-      let date = new Date(ms);
-      let time = [];
+      const date = new Date(ms);
 
-      let tH = date.getUTCHours();
-      let tM = date.getUTCMinutes();
-      let tS = date.getUTCSeconds();
+      let tH = date.getUTCHours().toString();
+      let tM = date.getUTCMinutes().toString();
+      let tS = date.getUTCSeconds().toString();
 
-      if (tH.toString().length === 1) {
-        tH = '0' + tH;
+      if (tH.length == 1) {
+        tH = `0${tH}`;
       }
-      if (tM.toString().length === 1) {
-        tM = '0' + tM;
+      if (tM.length == 1) {
+        tM = `0${tM}`;
       }
-      if (tS.toString().length === 1) {
-        tS = '0' + tS;
+      if (tS.length == 1) {
+        tS = `0${tS}`;
       }
 
-      time.push(tH);
-      time.push(tM);
-      time.push(tS);
-
-      return time.join(':');
+      return `${tH}:${tM}:${tS}`;
     }
 
     function prepare2Convert(convertvideos) {

@@ -183,9 +183,14 @@ function seekVideo(goto, gotoDurationInSeconds = 5) {
       if (currTime < mediaDuration) {
         let forwardedTime = currTime + gotoDurationInSeconds;
 
-        const { durationToSkip } = _isThisSceneSkippable(forwardedTime);
+        const { durationToSkip, currentTimeWholeNumber: forwardedTimeWholeNumber } = _isThisSceneSkippable(forwardedTime);
         if (durationToSkip) {
-          forwardedTime = (durationToSkip[1] + 2) + (forwardedTime - durationToSkip[0]);
+          forwardedTime = durationToSkip[1] + (forwardedTimeWholeNumber - durationToSkip[0]);
+          // function getCleanTime(time) {
+          //   // call this:_isThisSceneSkippable instead of _isInRange
+          //   return _isInRange(time) ? getCleanTime(time + 1) : time;
+          // }
+          // forwardedTime = getCleanTime(forwardedTime);
         }
 
         videoplayer.currentTime = forwardedTime;
@@ -195,9 +200,14 @@ function seekVideo(goto, gotoDurationInSeconds = 5) {
       if (currTime !== NaN && currTime > 0) {
         let reversedTime = currTime - gotoDurationInSeconds;
 
-        const { durationToSkip } = _isThisSceneSkippable(reversedTime);
+        const { durationToSkip, currentTimeWholeNumber: reversedTimeWholeNumber } = _isThisSceneSkippable(reversedTime);
         if (durationToSkip) {
-          reversedTime = (durationToSkip[0] - 2) - (durationToSkip[1] - reversedTime);
+          reversedTime = durationToSkip[0] - (durationToSkip[1] - reversedTimeWholeNumber);
+          // function getCleanTime(time) {
+          //   // call this:_isThisSceneSkippable instead of _isInRange
+          //   return _isInRange(time) ? getCleanTime(time - 1) : time;
+          // }
+          // reversedTime = getCleanTime(reversedTime);
         }
 
         videoplayer.currentTime = reversedTime;
@@ -589,6 +599,10 @@ function checkAndSkipScene(skipNow = true, currentTime, secondToAdd = 0) {
     }
   }
   return false;
+}
+
+function _isInRange(time = 0, durationToSkip = []) {
+  return time >= durationToSkip[0] && time <= durationToSkip[1];
 }
 
 function _isThisSceneSkippable(currentTime) {
