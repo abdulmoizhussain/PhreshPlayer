@@ -223,6 +223,8 @@
     const srt2vtt = require('srt2vtt')
     /* Only Windows & Linux support ffmpeg, as i know */
     const ffmpeg = require('fluent-ffmpeg');
+    const __desktopEnv = require('desktop-env');
+    let __setTimeoutIdForSkipper;
 
     if (os === 'win32') {
       ffmpeg.setFfmpegPath(path.join(__dirname, '..', '..', 'app.asar.unpacked', 'node_modules', 'ffmpeg-binaries', 'bin', 'ffmpeg.exe'));
@@ -391,9 +393,8 @@
       let currTime = videoplayer.currentTime;
       let reamingTime = mediaDuration - currTime;
 
-      if (playerjs.skipNextScene(currTime)) {
-        return;
-      }
+      // check and skip scene at next-second, if its skippable.
+      playerjs.checkAndSkipScene(false, currTime, 1);
 
       let currPercentage = Math.floor(100 * currTime / mediaDuration);
       let currPercentageToTasKbar = Math.max(currPercentage / 100);
@@ -411,8 +412,7 @@
       reamingtime.innerHTML = '- ' + getVideoTime(reamingTime * 1000);
 
       if (os === 'linux') {
-        const desktopEnv = require('desktop-env');
-        desktopEnv().then(currEnv => {
+        __desktopEnv().then(currEnv => {
           if (currEnv === 'Unity') {
             if (currPercentageToTasKbar !== NaN) {
               currentWindow.setProgressBar(currPercentageToTasKbar);
@@ -450,9 +450,11 @@
     playprogressholder.addEventListener("click", function (e) {
       const percent = e.offsetX / this.offsetWidth;
       const clickTime = percent * videoplayer.duration;
-      if (playerjs.skipScene(clickTime)) {
+
+      if (playerjs.checkAndSkipScene(true, clickTime)) {
         return;
       }
+
       videoplayer.currentTime = clickTime;
       playprogress.style.width = percent / 100 + "%";
     }, false);

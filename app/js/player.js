@@ -11,8 +11,7 @@ module.exports = {
   changeSubtitle,
   changeAudioTrack,
   toggleSkipState,
-  skipScene,
-  skipNextScene,
+  checkAndSkipScene,
   loadSkipFile,
   setLastPlayed
 };
@@ -184,9 +183,9 @@ function seekVideo(goto, gotoDurationInSeconds = 5) {
       if (currTime < mediaDuration) {
         let forwardedTime = currTime + gotoDurationInSeconds;
 
-        const durationToSkip = isThisSceneSkippable(forwardedTime);
+        const { durationToSkip } = _isThisSceneSkippable(forwardedTime);
         if (durationToSkip) {
-          forwardedTime = durationToSkip[1] + (forwardedTime - durationToSkip[0]);
+          forwardedTime = (durationToSkip[1] + 2) + (forwardedTime - durationToSkip[0]);
         }
 
         videoplayer.currentTime = forwardedTime;
@@ -196,16 +195,15 @@ function seekVideo(goto, gotoDurationInSeconds = 5) {
       if (currTime !== NaN && currTime > 0) {
         let reversedTime = currTime - gotoDurationInSeconds;
 
-        const durationToSkip = isThisSceneSkippable(reversedTime);
+        const { durationToSkip } = _isThisSceneSkippable(reversedTime);
         if (durationToSkip) {
-          reversedTime = durationToSkip[0] - (durationToSkip[1] - reversedTime);
+          reversedTime = (durationToSkip[0] - 2) - (durationToSkip[1] - reversedTime);
         }
 
         videoplayer.currentTime = reversedTime;
       }
       break;
   }
-
 }
 
 function loopVideo() {
@@ -559,14 +557,33 @@ function loadSkipFile() {
   }
 }
 
-function skipNextScene(__currentTimeExact) {
-  if (doSkipping) {
-    const __currentTime = Math.floor(__currentTimeExact) + 1;
-    for (__duration of skipDurations) {
-      if (__currentTime >= __duration[0] && __currentTime <= __duration[1]) {
-        setTimeout(function () {
-          videoplayer.currentTime = __duration[1] + 1;
-        }, (__currentTime - __currentTimeExact) * 1000);
+function checkAndSkipScene(skipNow = true, currentTime, secondToAdd = 0) {
+
+  const { durationToSkip, currentTimeWholeNumber } = _isThisSceneSkippable(currentTime + secondToAdd);
+
+  if (durationToSkip) {
+
+    if (skipNow) {
+      videoplayer.currentTime = durationToSkip[1] + 1;
+      return true;
+    }
+    else {
+
+      // if a timeout is already set for a scene-to-skip then don't set another one.
+      if (!__setTimeoutIdForSkipper) {
+
+        // save setTimeout-Id to be cancelled later, when the callback is called.
+        __setTimeoutIdForSkipper = setTimeout(
+          function () {
+            videoplayer.currentTime = durationToSkip[1] + 1;
+
+            // clear the timeout & save undefined in __setTimeoutIdForSkipper,
+            // so that next time setTimeout can be set.
+            __setTimeoutIdForSkipper = clearTimeout(__setTimeoutIdForSkipper);
+          },
+          // the next-second at which the callback will execute (in millis).
+          (currentTimeWholeNumber - currentTime) * 1000
+        );
         return true;
       }
     }
@@ -574,29 +591,18 @@ function skipNextScene(__currentTimeExact) {
   return false;
 }
 
-function isThisSceneSkippable(__currentTimeExact) {
-  if (doSkipping) {
-    const __currentTime = Math.floor(__currentTimeExact);
-    for (__durationToSkip of skipDurations) {
-      if (__currentTime >= __durationToSkip[0] && __currentTime <= __durationToSkip[1]) {
-        return __durationToSkip;
-      }
-    }
-  }
-  return null;
-}
-
-function skipScene(__currentTimeExact) {
+function _isThisSceneSkippable(currentTime) {
   if (doSkipping) { // only when skipping is on
-    const __currentTime = Math.floor(__currentTimeExact);
-    for (__duration of skipDurations) {
-      if (__currentTime >= __duration[0] && __currentTime <= __duration[1]) {
-        videoplayer.currentTime = __duration[1] + 1;
-        return true;
+
+    const currentTimeWholeNumber = Math.floor(currentTime); // floor is perfect. Dont use ceil/round.
+
+    for (let durationToSkip of skipDurations) {
+      if (currentTimeWholeNumber >= durationToSkip[0] && currentTimeWholeNumber <= durationToSkip[1]) {
+        return { durationToSkip, currentTimeWholeNumber };
       }
     }
   }
-  return false;
+  return {};
 }
 
 function toggleSkipState(_switch) {
