@@ -181,36 +181,41 @@ function seekVideo(goto, gotoDurationInSeconds = 5) {
   switch (goto) {
     case "forward":
       if (currTime < mediaDuration) {
-        let forwardedTime = currTime + gotoDurationInSeconds;
+        const forwardedTime = Math.floor(currTime + gotoDurationInSeconds);
 
-        const { durationToSkip, currentTimeWholeNumber: forwardedTimeWholeNumber } = _isThisSceneSkippable(forwardedTime);
-        if (durationToSkip) {
-          forwardedTime = durationToSkip[1] + (forwardedTimeWholeNumber - durationToSkip[0]);
-          // function getCleanTime(time) {
-          //   // call this:_isThisSceneSkippable instead of _isInRange
-          //   return _isInRange(time) ? getCleanTime(time + 1) : time;
-          // }
-          // forwardedTime = getCleanTime(forwardedTime);
+        function cleanTime(time) {
+          const { durationToSkip } = _isThisSceneSkippable(time);
+          if (durationToSkip) {
+            
+            // " +1 ": coz there will be max-call-stack when exact boundry value is calculated.
+            time = (durationToSkip[1] + 1) + (time - durationToSkip[0]);
+
+            return cleanTime(time);
+          }
+          return time;
         }
 
-        videoplayer.currentTime = forwardedTime;
+        videoplayer.currentTime = cleanTime(forwardedTime);
       }
       break;
+
     case "backward":
       if (currTime !== NaN && currTime > 0) {
-        let reversedTime = currTime - gotoDurationInSeconds;
+        const reversedTime = Math.floor(currTime - gotoDurationInSeconds);
 
-        const { durationToSkip, currentTimeWholeNumber: reversedTimeWholeNumber } = _isThisSceneSkippable(reversedTime);
-        if (durationToSkip) {
-          reversedTime = durationToSkip[0] - (durationToSkip[1] - reversedTimeWholeNumber);
-          // function getCleanTime(time) {
-          //   // call this:_isThisSceneSkippable instead of _isInRange
-          //   return _isInRange(time) ? getCleanTime(time - 1) : time;
-          // }
-          // reversedTime = getCleanTime(reversedTime);
+        function cleanTime(time) {
+          const { durationToSkip } = _isThisSceneSkippable(time);
+          if (durationToSkip) {
+
+            // " -1 ": coz there will be max-call-stack when exact boundry value is calculated.
+            time = (durationToSkip[0] - 1) - (durationToSkip[1] - time);
+
+            return cleanTime(time);
+          }
+          return time;
         }
 
-        videoplayer.currentTime = reversedTime;
+        videoplayer.currentTime = cleanTime(reversedTime);
       }
       break;
   }
@@ -599,10 +604,6 @@ function checkAndSkipScene(skipNow = true, currentTime, secondToAdd = 0) {
     }
   }
   return false;
-}
-
-function _isInRange(time = 0, durationToSkip = []) {
-  return time >= durationToSkip[0] && time <= durationToSkip[1];
 }
 
 function _isThisSceneSkippable(currentTime) {
