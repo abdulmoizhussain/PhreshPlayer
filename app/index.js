@@ -36,7 +36,9 @@ const srt2vtt = require('srt2vtt');
 /* Only Windows & Linux support ffmpeg, as i know */
 const ffmpeg = require('fluent-ffmpeg');
 const __desktopEnv = require('desktop-env');
-const Constants = require("./js/constants");
+const Constants = require("./js/constants.js");
+const playlistjs = require("./js/playlist.js");
+const playerjs = require('./js/player.js');
 
 let __setTimeoutIdForSkipper;
 
@@ -804,9 +806,6 @@ function convert2AAC(b) {
   });
 
 }
-
-const playerjs = require('./js/player.js');
-const playlistjs = require('./js/playlist.js');
 
 function toggleDevTools() {
   let DevIsOpened = currentWindow.webContents.isDevToolsOpened()

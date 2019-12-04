@@ -6,6 +6,12 @@ module.exports = {
   readPlaylistFile
 };
 
+const _playerJs = require('./player.js');
+const Datastore = require('nedb');
+const appDir = app.getPath('userData');
+
+const playlistfile = new Datastore({ filename: appDir + '/playlist.db', autoload: true });
+
 function toggleShowPlaylist() {
 
   let isPlaylistVisible = playlist.style.display;
@@ -14,7 +20,7 @@ function toggleShowPlaylist() {
 
     playlist.style.display = 'none';
     videoplayer.style.width = '100%';
-    w3.removeClass('#playlistbutton','activated');
+    w3.removeClass('#playlistbutton', 'activated');
     store.set('settings.showplaylist', false);
     setToast(i18n.__('playlist') + ' ' + i18n.__('off'));
 
@@ -22,7 +28,7 @@ function toggleShowPlaylist() {
 
     playlist.style.display = 'block';
     videoplayer.style.width = '60%';
-    w3.addClass('#playlistbutton','activated');
+    w3.addClass('#playlistbutton', 'activated');
     store.set('settings.showplaylist', true);
     setToast(i18n.__('playlist') + ' ' + i18n.__('on'));
 
@@ -32,9 +38,9 @@ function toggleShowPlaylist() {
 
 function fillPlaylist() {
 
-  playlistfile.find({}, function(err, docs) {
-    docs.forEach(function(d) {
-  
+  playlistfile.find({}, function (err, docs) {
+    docs.forEach(function (d) {
+
       let playlistLI = document.createElement("li");
       playlistLI.appendChild(document.createTextNode(d._name));
       playlistLI.setAttribute("id", "vid-" + d._id);
@@ -45,11 +51,11 @@ function fillPlaylist() {
     });
 
     if (store.has('lastplayed.videoid') && store.has('lastplayed.videotime')) {
-      
+
       let lastPlayed = store.get('lastplayed.videoid');
       let lastPlayedTime = store.get('lastplayed.videotime');
-      
-      playerjs.playVideo(lastPlayed);
+
+      _playerJs.playVideo(lastPlayed);
       videoplayer.currentTime = lastPlayedTime;
 
     }
@@ -61,8 +67,8 @@ fillPlaylist();
 
 function addToPlaylist(newvideos) {
 
-  playlistfile.insert(newvideos, function(err, docs) {
-    docs.forEach(function(d) {
+  playlistfile.insert(newvideos, function (err, docs) {
+    docs.forEach(function (d) {
 
       console.log('Added file:', d._name);
 
@@ -82,8 +88,8 @@ function savePlaylist() {
 
   let playlistString = '';
 
-  playlistfile.find({}, function(err, docs) {
-    docs.forEach(function(d) {
+  playlistfile.find({}, function (err, docs) {
+    docs.forEach(function (d) {
 
       playlistString += d._name + '*' + d._path + '\n';
 
@@ -96,7 +102,7 @@ function savePlaylist() {
       extensions: ['.pppl']
     }]
 
-    if (fileName === undefined){
+    if (fileName === undefined) {
       alert(i18n.__('file_not_saved') + "!");
       return;
     }
@@ -108,7 +114,7 @@ function savePlaylist() {
     }
 
     fs.writeFile(fileName + '.pppl', playlistString, (err) => {
-      if(err){
+      if (err) {
         alert(i18n.__('file_save_failed') + err.message)
       }
       /* alert(i18n.__('file_saved') + "!"); */
@@ -122,15 +128,15 @@ function savePlaylist() {
 function readPlaylistFile(playlistfilepath) {
 
   let readline = require('readline'),
-      instream = fs.createReadStream(playlistfilepath),
-      outstream = new (require('stream'))(),
-      rl = readline.createInterface(instream, outstream);
-  
+    instream = fs.createReadStream(playlistfilepath),
+    outstream = new (require('stream'))(),
+    rl = readline.createInterface(instream, outstream);
+
   let newid2 = playlist.getElementsByTagName('li').length;
   let newvideos2 = [];
 
   rl.on('line', function (line) {
-      
+
     let lineparts = line.split('*');
     let filename2 = lineparts[0];
     let filepath2 = lineparts[1];
@@ -147,7 +153,8 @@ function readPlaylistFile(playlistfilepath) {
 
   });
 
-  rl.on('close', function (line) {console.log(newvideos2)
+  rl.on('close', function (line) {
+    console.log(newvideos2)
     addToPlaylist(newvideos2);
   });
 
@@ -163,19 +170,19 @@ ipcRenderer.on('openedfile', (event, openedfile) => {
     let openedFilePath = openedfile;
     let openedFileName = path.basename(openedfile);
     let openedFileExt = path.extname(openedfile);
-              
+
     if (openedFileExt === '.pppl') {
-      
+
       playlistfile.remove({}, { multi: true }, function (err, numRemoved) {
         playlist.innerHTML = '';
         readPlaylistFile(openedFilePath);
-        setTimeout(function(){ playerjs.playVideo(1); }, 500);
+        setTimeout(function () { _playerJs.playVideo(1); }, 500);
       });
 
     } else {
 
       /* mp4, mkv, etc => if associated to the player */
-      if ( supportedFileExts.indexOf(openedFileExt) !== -1 ) {
+      if (supportedFileExts.indexOf(openedFileExt) !== -1) {
 
         playlistfile.remove({}, { multi: true }, function (err, numRemoved) {
           playlist.innerHTML = '';
@@ -187,10 +194,10 @@ ipcRenderer.on('openedfile', (event, openedfile) => {
             _path: openedFilePath
           };
           newvideos.push(newvideo);
-  
+
           addToPlaylist(newvideos);
 
-          setTimeout(function(){ playerjs.playVideo(1); }, 500);
+          setTimeout(function () { _playerJs.playVideo(1); }, 500);
         });
 
       }
