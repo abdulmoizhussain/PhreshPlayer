@@ -1,7 +1,7 @@
 {
   "name": "phreshplayer",
   "productName": "PhreshPlayer",
-  "version": "1.0.4",
+  "version": "1.0.3",
   "description": "Electron media player application.",
   "homepage": "https://phresh-it.hu/apps/phreshplayer/",
   "author": "Phresh",
